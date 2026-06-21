@@ -18,6 +18,7 @@ const AlertsPage: React.FC = () => {
   const { alerts, refreshStatistics } = useAppContext();
   const [activeFilter, setActiveFilter] = useState<Alert['severity'] | 'all'>('all');
   const [showResolved, setShowResolved] = useState(false);
+  const [confirmedFilter, setConfirmedFilter] = useState<'all' | 'confirmed' | 'unconfirmed'>('all');
 
   usePullDownRefresh(() => {
     refreshStatistics();
@@ -35,22 +36,36 @@ const AlertsPage: React.FC = () => {
 
   const filteredAlerts = useMemo(() => {
     let list = showResolved ? resolvedAlerts : activeAlerts;
-    if (activeFilter === 'all') return list;
-    return list.filter(a => a.severity === activeFilter);
-  }, [activeAlerts, resolvedAlerts, activeFilter, showResolved]);
+    if (activeFilter !== 'all') {
+      list = list.filter(a => a.severity === activeFilter);
+    }
+    if (confirmedFilter === 'confirmed') {
+      list = list.filter(a => a.isSensitiveConfirmed === true);
+    } else if (confirmedFilter === 'unconfirmed') {
+      list = list.filter(a => a.isSensitiveConfirmed === false);
+    }
+    return list;
+  }, [activeAlerts, resolvedAlerts, activeFilter, showResolved, confirmedFilter]);
 
   const stats = useMemo(() => {
     return {
       total: activeAlerts.length,
       high: activeAlerts.filter(a => a.severity === 'high').length,
       medium: activeAlerts.filter(a => a.severity === 'medium').length,
-      low: activeAlerts.filter(a => a.severity === 'low').length
+      low: activeAlerts.filter(a => a.severity === 'low').length,
+      unconfirmedSensitive: activeAlerts.filter(a => a.type === 'sensitive' && a.isSensitiveConfirmed === false).length,
+      confirmedSensitive: activeAlerts.filter(a => a.type === 'sensitive' && a.isSensitiveConfirmed === true).length
     };
   }, [activeAlerts]);
 
   const handleFilterChange = (key: Alert['severity'] | 'all') => {
     setActiveFilter(key);
     console.log('[AlertsPage] Filter changed', { key });
+  };
+
+  const handleConfirmedFilterChange = (key: 'all' | 'confirmed' | 'unconfirmed') => {
+    setConfirmedFilter(key);
+    console.log('[AlertsPage] Confirmed filter changed', { key });
   };
 
   const toggleResolved = () => {
@@ -78,6 +93,23 @@ const AlertsPage: React.FC = () => {
             <Text className={styles.label}>低风险</Text>
           </View>
         </View>
+
+        <View className={styles.sensitiveStats}>
+          <View className={classnames(styles.sensitiveStat, styles.unconfirmed)}>
+            <Text className={styles.icon}>⚠️</Text>
+            <View className={styles.sensitiveInfo}>
+              <Text className={styles.sensitiveCount}>{stats.unconfirmedSensitive}</Text>
+              <Text className={styles.sensitiveLabel}>待确认敏感目录</Text>
+            </View>
+          </View>
+          <View className={classnames(styles.sensitiveStat, styles.confirmed)}>
+            <Text className={styles.icon}>✅</Text>
+            <View className={styles.sensitiveInfo}>
+              <Text className={styles.sensitiveCount}>{stats.confirmedSensitive}</Text>
+              <Text className={styles.sensitiveLabel}>已确认敏感目录</Text>
+            </View>
+          </View>
+        </View>
       </View>
 
       <View className={styles.filterBar}>
@@ -94,6 +126,27 @@ const AlertsPage: React.FC = () => {
             <Text>{filter.label}</Text>
           </View>
         ))}
+      </View>
+
+      <View className={styles.subFilterBar}>
+        <View
+          className={classnames(styles.subFilterItem, confirmedFilter === 'all' && styles.active)}
+          onClick={() => handleConfirmedFilterChange('all')}
+        >
+          <Text>全部敏感目录</Text>
+        </View>
+        <View
+          className={classnames(styles.subFilterItem, confirmedFilter === 'unconfirmed' && styles.active, styles.unconfirmed)}
+          onClick={() => handleConfirmedFilterChange('unconfirmed')}
+        >
+          <Text>待确认</Text>
+        </View>
+        <View
+          className={classnames(styles.subFilterItem, confirmedFilter === 'confirmed' && styles.active, styles.confirmed)}
+          onClick={() => handleConfirmedFilterChange('confirmed')}
+        >
+          <Text>已确认</Text>
+        </View>
       </View>
 
       <View className={styles.content}>

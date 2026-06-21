@@ -42,6 +42,11 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, showRisk = true }) => {
           <Text className={styles.title}>{folder.name}</Text>
           <View className={styles.tagRow}>
             {folder.isSensitive && <StatusTag type="sensitive" value="sensitive" />}
+            {folder.sensitiveConfirmed && (
+              <View className={styles.confirmedBadge}>
+                <Text>✓ 已确认</Text>
+              </View>
+            )}
             {showRisk && riskCheck.hasRisk && (
               <View className={styles.riskBadge}>
                 <Text className={styles.icon}>⚠️</Text>

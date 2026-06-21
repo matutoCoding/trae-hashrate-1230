@@ -33,6 +33,14 @@ export interface FolderPermission {
   grantedBy: string;
 }
 
+export interface SensitiveConfirmation {
+  confirmedBy: string;
+  confirmedByName: string;
+  confirmedAt: string;
+  sharedMembers: string[];
+  notes?: string;
+}
+
 export interface Folder {
   id: string;
   name: string;
@@ -40,6 +48,7 @@ export interface Folder {
   path: string;
   description: string;
   isSensitive: boolean;
+  sensitiveConfirmed?: SensitiveConfirmation;
   fileCount: number;
   size: string;
   updatedAt: string;
@@ -58,6 +67,7 @@ export interface Alert {
   severity: 'high' | 'medium' | 'low';
   createdAt: string;
   isResolved: boolean;
+  isSensitiveConfirmed?: boolean;
 }
 
 export interface HandoverItem {
@@ -69,9 +79,32 @@ export interface HandoverItem {
   folderName?: string;
   memberId?: string;
   memberName?: string;
+  targetMemberId?: string;
+  targetMemberName?: string;
+  permission?: string;
   status: HandoverStatus;
   dueDate: string;
   notes?: string;
+  updatedAt?: string;
+}
+
+export interface HandoverReport {
+  semester: string;
+  generatedAt: string;
+  summary: {
+    total: number;
+    completed: number;
+    inProgress: number;
+    pending: number;
+    transfer: number;
+    revoke: number;
+    supervisorConfirm: number;
+  };
+  items: {
+    transfer: HandoverItem[];
+    revoke: HandoverItem[];
+    supervisorConfirm: HandoverItem[];
+  };
 }
 
 export interface Statistics {

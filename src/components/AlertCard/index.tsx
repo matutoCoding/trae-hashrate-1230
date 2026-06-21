@@ -51,8 +51,15 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert }) => {
     >
       <View className={styles.header}>
         <Text className={styles.title}>{alert.title}</Text>
-        <View className={classnames(styles.severityBadge, styles[alert.severity])}>
-          <Text>{getSeverityText(alert.severity)}</Text>
+        <View className={styles.badgeGroup}>
+          {alert.type === 'sensitive_folder' && alert.isSensitiveConfirmed && (
+            <View className={styles.confirmedBadge}>
+              <Text>✓ 已确认</Text>
+            </View>
+          )}
+          <View className={classnames(styles.severityBadge, styles[alert.severity])}>
+            <Text>{getSeverityText(alert.severity)}</Text>
+          </View>
         </View>
       </View>
 

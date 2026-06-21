@@ -100,6 +100,17 @@
   }
 }
 
+.confirmedBadge {
+  display: flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+  background: rgba(0, 180, 42, 0.1);
+  color: $color-success;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
 .riskBadge {
   display: flex;
   align-items: center;

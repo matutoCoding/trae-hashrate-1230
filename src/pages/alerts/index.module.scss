@@ -62,13 +62,98 @@
   }
 }
 
+.sensitiveStats {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+}
+
+.sensitiveStat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+
+  .icon {
+    font-size: 40rpx;
+    flex-shrink: 0;
+  }
+
+  .sensitiveInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sensitiveCount {
+    display: block;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+  }
+
+  .sensitiveLabel {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: 2rpx;
+  }
+
+  &.unconfirmed .sensitiveCount {
+    color: $color-error;
+  }
+
+  &.confirmed .sensitiveCount {
+    color: $color-success;
+  }
+}
+
 .filterBar {
   display: flex;
   background: $color-bg-card;
-  margin: $spacing-lg;
+  margin: $spacing-lg $spacing-lg 0;
   border-radius: $radius-lg;
   padding: $spacing-xs;
   box-shadow: $shadow-card;
+}
+
+.subFilterBar {
+  display: flex;
+  background: $color-bg-card;
+  margin: $spacing-md $spacing-lg $spacing-lg;
+  border-radius: $radius-lg;
+  padding: $spacing-xs;
+  box-shadow: $shadow-card;
+}
+
+.subFilterItem {
+  flex: 1;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+
+  &.active {
+    background: $color-primary;
+    color: $color-text-white;
+    font-weight: $font-weight-semibold;
+  }
+
+  &.active.unconfirmed {
+    background: $color-error;
+  }
+
+  &.active.confirmed {
+    background: $color-success;
+  }
 }
 
 .filterItem {

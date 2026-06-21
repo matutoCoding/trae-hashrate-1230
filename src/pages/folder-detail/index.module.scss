@@ -83,12 +83,26 @@
   padding: $spacing-md 0;
 }
 
+.confirmedTag {
+  background: rgba(0, 180, 42, 0.2);
+  color: $color-success;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
 .sensitiveAlert {
   background: linear-gradient(135deg, rgba(245, 63, 63, 0.1) 0%, rgba(255, 125, 0, 0.1) 100%);
   border: 1rpx solid rgba(245, 63, 63, 0.2);
   border-radius: $radius-lg;
   padding: $spacing-lg;
   margin: 0 $spacing-lg $spacing-lg;
+
+  &.confirmed {
+    background: linear-gradient(135deg, rgba(0, 180, 42, 0.1) 0%, rgba(30, 94, 190, 0.1) 100%);
+    border-color: rgba(0, 180, 42, 0.2);
+  }
 
   .alertHeader {
     display: flex;
@@ -107,11 +121,55 @@
     }
   }
 
+  &.confirmed .alertHeader .title {
+    color: $color-success;
+  }
+
   .alertDesc {
     font-size: $font-size-sm;
     color: $color-text-secondary;
     line-height: $line-height-normal;
     margin-bottom: $spacing-md;
+  }
+
+  .confirmationRecord {
+    background: $color-bg-card;
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    margin-bottom: $spacing-md;
+
+    .recordTitle {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    .recordItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: $spacing-xs 0;
+
+      &:not(:last-child) {
+        border-bottom: 1rpx solid $color-divider;
+      }
+
+      .recordLabel {
+        font-size: $font-size-xs;
+        color: $color-text-tertiary;
+        flex-shrink: 0;
+        margin-right: $spacing-md;
+      }
+
+      .recordValue {
+        font-size: $font-size-xs;
+        color: $color-text-primary;
+        text-align: right;
+        flex: 1;
+        line-height: $line-height-normal;
+      }
+    }
   }
 
   .alertBtn {

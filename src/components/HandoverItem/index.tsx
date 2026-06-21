@@ -9,14 +9,20 @@ import { useAppContext } from '@/store/AppContext';
 
 interface HandoverItemProps {
   item: HandoverItem;
+  onStatusChange?: (status: HandoverItem['status']) => void;
 }
 
-const HandoverItemCard: React.FC<HandoverItemProps> = ({ item }) => {
+const HandoverItemCard: React.FC<HandoverItemProps> = ({ item, onStatusChange }) => {
   const { updateHandoverStatus } = useAppContext();
 
   const isOverdue = new Date(item.dueDate) < new Date() && item.status !== 'completed';
 
   const handleStatusChange = (newStatus: HandoverItem['status']) => {
+    if (onStatusChange) {
+      onStatusChange(newStatus);
+      return;
+    }
+
     const statusText: Record<string, string> = {
       confirmed: '确认处理中',
       completed: '完成交接'

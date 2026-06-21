@@ -1,4 +1,4 @@
-import type { FolderPermission, MemberStatus } from '@/types';
+import type { FolderPermission, MemberStatus, HandoverItem, HandoverReport } from '@/types';
 
 const SENSITIVE_KEYWORDS = ['经费', '合同', '伦理审批', '保密', '专利', '财务', '报销'];
 
@@ -79,33 +79,37 @@ export const getSeverityText = (severity: string): string => {
   return map[severity] || severity;
 };
 
-export const generateHandoverReport = (handoverItems: any[]): string => {
+export const generateHandoverReport = (handoverItems: HandoverItem[]): HandoverReport => {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const semester = month <= 6 ? `${year - 1}-${year}学年第二学期` : `${year}-${year + 1}学年第一学期`;
+  
   const transferItems = handoverItems.filter(item => item.type === 'transfer');
   const revokeItems = handoverItems.filter(item => item.type === 'revoke');
   const confirmItems = handoverItems.filter(item => item.type === 'supervisor_confirm');
   
   const completedCount = handoverItems.filter(item => item.status === 'completed').length;
+  const pendingCount = handoverItems.filter(item => item.status === 'pending').length;
+  const confirmedCount = handoverItems.filter(item => item.status === 'confirmed').length;
   const totalCount = handoverItems.length;
   
-  const report = [
-    '=== 学期交接清单报告 ===',
-    '',
-    `统计概览:`,
-    `  总项数: ${totalCount}`,
-    `  已完成: ${completedCount}`,
-    `  待处理: ${totalCount - completedCount}`,
-    '',
-    `应移交 (${transferItems.length} 项):`,
-    ...transferItems.map(item => `  - ${item.folderName}: ${item.memberName} → ${item.targetMemberName || '指定接收人'}`),
-    '',
-    `应收回 (${revokeItems.length} 项):`,
-    ...revokeItems.map(item => `  - ${item.folderName}: 收回 ${item.memberName} 的${getPermissionText(item.permission)}权限`),
-    '',
-    `需导师确认 (${confirmItems.length} 项):`,
-    ...confirmItems.map(item => `  - ${item.folderName}: ${item.memberName} 的${getPermissionText(item.permission)}权限`),
-    '',
-    '=== 报告结束 ==='
-  ].join('\n');
-  
-  return report;
+  return {
+    semester,
+    generatedAt: `${year}年${month}月${now.getDate()}日`,
+    summary: {
+      total: totalCount,
+      completed: completedCount,
+      inProgress: confirmedCount,
+      pending: pendingCount,
+      transfer: transferItems.length,
+      revoke: revokeItems.length,
+      supervisorConfirm: confirmItems.length
+    },
+    items: {
+      transfer: transferItems,
+      revoke: revokeItems,
+      supervisorConfirm: confirmItems
+    }
+  };
 };

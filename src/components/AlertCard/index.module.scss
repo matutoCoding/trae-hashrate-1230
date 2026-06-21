@@ -46,6 +46,24 @@
   margin-right: $spacing-md;
 }
 
+.badgeGroup {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-shrink: 0;
+}
+
+.confirmedBadge {
+  display: flex;
+  align-items: center;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  background: rgba(0, 180, 42, 0.1);
+  color: $color-success;
+}
+
 .severityBadge {
   display: flex;
   align-items: center;

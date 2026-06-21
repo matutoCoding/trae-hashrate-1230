@@ -48,6 +48,11 @@
     }
   }
 
+  .actionRow {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
   .action {
     @include button-reset;
     height: $button-height-sm;
@@ -60,6 +65,23 @@
 
     &:active {
       background: $color-primary-dark;
+      opacity: 0.9;
+      transform: scale(0.98);
+    }
+  }
+
+  .resetBtn {
+    @include button-reset;
+    height: $button-height-sm;
+    padding: 0 $spacing-md;
+    border-radius: $radius-button;
+    background: $color-bg-hover;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    &:active {
+      background: $color-border;
       opacity: 0.9;
       transform: scale(0.98);
     }
@@ -212,6 +234,256 @@
 
   .text {
     font-size: $font-size-md;
+    color: $color-text-tertiary;
+  }
+}
+
+.reportHeader {
+  background: linear-gradient(135deg, $color-primary 0%, #722ED1 100%);
+  padding: $spacing-xl $spacing-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .reportHeaderContent {
+    flex: 1;
+  }
+
+  .reportTitle {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-white;
+    display: block;
+    margin-bottom: $spacing-sm;
+  }
+
+  .reportSemester {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: rgba(255, 255, 255, 0.9);
+    display: block;
+  }
+
+  .reportDate {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: $spacing-xs;
+    display: block;
+  }
+
+  .closeReportBtn {
+    @include button-reset;
+    height: $button-height-sm;
+    padding: 0 $spacing-lg;
+    border-radius: $radius-button;
+    background: rgba(255, 255, 255, 0.2);
+    color: $color-text-white;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0.98);
+    }
+  }
+}
+
+.reportContent {
+  height: calc(100vh - 200rpx);
+  padding: $spacing-lg;
+}
+
+.reportSummary {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+
+  .summaryTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-lg;
+  }
+
+  .summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
+  }
+
+  .summaryItem {
+    text-align: center;
+    padding: $spacing-md;
+    background: $color-bg-page;
+    border-radius: $radius-md;
+
+    .summaryValue {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $color-primary;
+      display: block;
+    }
+
+    .summaryLabel {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+      margin-top: 4rpx;
+      display: block;
+    }
+  }
+
+  .summaryProgress {
+    .progressLabelRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: $spacing-sm;
+
+      .progressLabel {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+      }
+
+      .progressPercent {
+        font-size: $font-size-md;
+        font-weight: $font-weight-semibold;
+        color: $color-primary;
+      }
+    }
+
+    .progressTrack {
+      height: 16rpx;
+      background: $color-bg-hover;
+      border-radius: $radius-round;
+      overflow: hidden;
+
+      .progressFill {
+        height: 100%;
+        background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+        border-radius: $radius-round;
+        transition: width $transition-base;
+      }
+    }
+  }
+}
+
+.reportSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+
+  .reportSectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-md;
+    border-bottom: 1rpx solid $color-border;
+
+    .reportSectionTitle {
+      font-size: $font-size-md;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+
+      &.transfer {
+        color: #722ED1;
+      }
+
+      &.revoke {
+        color: $color-error;
+      }
+
+      &.supervisorConfirm {
+        color: $color-primary;
+      }
+    }
+
+    .reportSectionCount {
+      font-size: $font-size-sm;
+      color: $color-text-tertiary;
+    }
+  }
+
+  .reportItem {
+    padding: $spacing-md;
+    background: $color-bg-page;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-sm;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .reportItemHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: $spacing-xs;
+
+      .reportItemTitle {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        color: $color-text-primary;
+        flex: 1;
+      }
+
+      .reportItemStatus {
+        font-size: $font-size-xs;
+        padding: 4rpx 12rpx;
+        border-radius: $radius-round;
+        font-weight: $font-weight-medium;
+
+        &.statusCompleted {
+          background: rgba(0, 180, 42, 0.1);
+          color: $color-success;
+        }
+
+        &.statusConfirmed {
+          background: rgba(30, 94, 190, 0.1);
+          color: $color-primary;
+        }
+
+        &.statusPending {
+          background: rgba(255, 125, 0, 0.1);
+          color: $color-warning;
+        }
+      }
+    }
+
+    .reportItemDesc {
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+      margin-bottom: $spacing-xs;
+      display: block;
+    }
+
+    .reportItemMeta {
+      font-size: $font-size-xs;
+      color: $color-text-tertiary;
+      display: block;
+      margin-top: 4rpx;
+    }
+  }
+
+  .reportEmpty {
+    text-align: center;
+    padding: $spacing-lg;
+    color: $color-text-tertiary;
+    font-size: $font-size-sm;
+  }
+}
+
+.reportFooter {
+  text-align: center;
+  padding: $spacing-xl 0;
+
+  .reportFooterText {
+    font-size: $font-size-xs;
     color: $color-text-tertiary;
   }
 }
