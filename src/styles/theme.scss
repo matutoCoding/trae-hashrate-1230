@@ -1,0 +1,49 @@
+// ============================================
+// 主题配色变量（共享文件夹权限审计小程序）
+// ============================================
+
+// 品牌主题色：学术蓝，代表专业、可信赖
+$color-primary: #1E5EBE;
+$color-primary-light: #4A87E8;
+$color-primary-dark: #0D4499;
+
+// 功能色
+$color-success: #00B42A;
+$color-warning: #FF7D00;
+$color-error: #F53F3F;
+$color-info: #86909C;
+
+// 背景色
+$color-bg-page: #F5F7FA;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #F2F3F5;
+
+// 文本色
+$color-text-primary: #1D2129;
+$color-text-secondary: #4E5969;
+$color-text-tertiary: #86909C;
+$color-text-disabled: #C9CDD4;
+$color-text-white: #FFFFFF;
+
+// 边框色
+$color-border: #E5E6EB;
+$color-divider: #F2F3F5;
+
+// 业务相关变量
+// 成员状态标签
+$color-tag-studying-bg: #E8F3FF;
+$color-tag-studying-text: #165DFF;
+$color-tag-graduated-bg: #FFF7E8;
+$color-tag-graduated-text: #FF7D00;
+$color-tag-collaboration-ended-bg: #FFECE8;
+$color-tag-collaboration-ended-text: #F53F3F;
+
+// 敏感目录标签
+$color-tag-sensitive-bg: #FFECE8;
+$color-tag-sensitive-text: #F53F3F;
+
+// 文件夹分类色
+$color-category-paper: #165DFF;
+$color-category-experiment: #00B42A;
+$color-category-fund: #FF7D00;
+$color-category-graduation: #722ED1;

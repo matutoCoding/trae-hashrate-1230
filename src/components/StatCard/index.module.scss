@@ -1,0 +1,67 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.iconContainer {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+
+  &.blue {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  }
+
+  &.green {
+    background: linear-gradient(135deg, $color-success 0%, #23C343 100%);
+  }
+
+  &.orange {
+    background: linear-gradient(135deg, $color-warning 0%, #FF9A2E 100%);
+  }
+
+  &.red {
+    background: linear-gradient(135deg, $color-error 0%, #FF7875 100%);
+  }
+
+  &.purple {
+    background: linear-gradient(135deg, #722ED1 0%, #9254DE 100%);
+  }
+}
+
+.content {
+  flex: 1;
+  margin-left: $spacing-lg;
+}
+
+.value {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.2;
+}
+
+.label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: $spacing-xs;
+}

@@ -1,0 +1,82 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+
+  &.studying {
+    background-color: $color-tag-studying-bg;
+    color: $color-tag-studying-text;
+  }
+
+  &.graduated {
+    background-color: $color-tag-graduated-bg;
+    color: $color-tag-graduated-text;
+  }
+
+  &.collaboration_ended {
+    background-color: $color-tag-collaboration-ended-bg;
+    color: $color-tag-collaboration-ended-text;
+  }
+
+  &.external {
+    background-color: $color-tag-studying-bg;
+    color: $color-tag-studying-text;
+  }
+
+  &.sensitive {
+    background-color: $color-tag-sensitive-bg;
+    color: $color-tag-sensitive-text;
+  }
+
+  &.high {
+    background-color: rgba(245, 63, 63, 0.1);
+    color: $color-error;
+  }
+
+  &.medium {
+    background-color: rgba(255, 125, 0, 0.1);
+    color: $color-warning;
+  }
+
+  &.low {
+    background-color: rgba(134, 144, 156, 0.1);
+    color: $color-info;
+  }
+
+  &.pending {
+    background-color: rgba(255, 125, 0, 0.1);
+    color: $color-warning;
+  }
+
+  &.confirmed {
+    background-color: rgba(22, 93, 255, 0.1);
+    color: $color-primary;
+  }
+
+  &.completed {
+    background-color: rgba(0, 180, 42, 0.1);
+    color: $color-success;
+  }
+
+  &.transfer {
+    background-color: rgba(114, 46, 209, 0.1);
+    color: #722ED1;
+  }
+
+  &.revoke {
+    background-color: rgba(245, 63, 63, 0.1);
+    color: $color-error;
+  }
+
+  &.supervisor_confirm {
+    background-color: rgba(22, 93, 255, 0.1);
+    color: $color-primary;
+  }
+}
