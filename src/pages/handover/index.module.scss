@@ -271,6 +271,27 @@
     display: block;
   }
 
+  .reportBtnGroup {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  .exportBtn {
+    @include button-reset;
+    height: $button-height-sm;
+    padding: 0 $spacing-md;
+    border-radius: $radius-button;
+    background: rgba(255, 255, 255, 0.95);
+    color: $color-primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.8);
+      transform: scale(0.98);
+    }
+  }
+
   .closeReportBtn {
     @include button-reset;
     height: $button-height-sm;
@@ -286,6 +307,25 @@
       transform: scale(0.98);
     }
   }
+}
+
+.textReportContainer {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.textReportArea {
+  width: 100%;
+  min-height: 800rpx;
+  font-size: $font-size-xs;
+  line-height: 1.8;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-family: 'Consolas', 'Monaco', monospace;
 }
 
 .reportContent {

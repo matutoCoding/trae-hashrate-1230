@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, Button, ScrollView } from '@tarojs/components';
+import { View, Text, Button, ScrollView, Textarea } from '@tarojs/components';
 import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { useAppContext } from '@/store/AppContext';
 import HandoverItemCard from '@/components/HandoverItem';
 import type { HandoverItem, HandoverType, HandoverReport } from '@/types';
-import { getHandoverTypeText, generateHandoverReport } from '@/utils/permission';
+import { getHandoverTypeText, generateHandoverReport, generateHandoverReportText } from '@/utils/permission';
 
 const typeFilters: { key: HandoverType | 'all'; label: string; className?: string }[] = [
   { key: 'all', label: '全部' },
@@ -20,9 +20,15 @@ const HandoverPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<HandoverType | 'all'>('all');
   const [showCompleted, setShowCompleted] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showTextReport, setShowTextReport] = useState(false);
 
   const report: HandoverReport = useMemo(
     () => generateHandoverReport(handoverItems),
+    [handoverItems]
+  );
+
+  const reportText = useMemo(
+    () => generateHandoverReportText(handoverItems),
     [handoverItems]
   );
 
@@ -117,6 +123,22 @@ const HandoverPage: React.FC = () => {
     });
   };
 
+  const handleExportText = () => {
+    setShowTextReport(true);
+  };
+
+  const handleCopyText = () => {
+    Taro.setClipboardData({
+      data: reportText,
+      success: () => {
+        Taro.showToast({
+          title: '已复制到剪贴板',
+          icon: 'success'
+        });
+      }
+    });
+  };
+
   const renderReportSection = (title: string, items: HandoverItem[], type: HandoverType) => (
     <View className={styles.reportSection}>
       <View className={styles.reportSectionHeader}>
@@ -157,6 +179,40 @@ const HandoverPage: React.FC = () => {
     </View>
   );
 
+  if (showTextReport) {
+    return (
+      <View className={styles.container}>
+        <View className={styles.reportHeader}>
+          <View className={styles.reportHeaderContent}>
+            <Text className={styles.reportTitle}>📝 交接报告文本</Text>
+            <Text className={styles.reportSemester}>可复制后发送邮件或存档</Text>
+            <Text className={styles.reportDate}>生成日期：{report.generatedAt}</Text>
+          </View>
+          <View className={styles.reportBtnGroup}>
+            <Button className={styles.exportBtn} onClick={handleCopyText}>
+              复制文本
+            </Button>
+            <Button className={styles.closeReportBtn} onClick={() => setShowTextReport(false)}>
+              返回
+            </Button>
+          </View>
+        </View>
+
+        <ScrollView className={styles.reportContent} scrollY>
+          <View className={styles.textReportContainer}>
+            <Textarea
+              className={styles.textReportArea}
+              value={reportText}
+              autoHeight
+              maxlength={-1}
+              disabled
+            />
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
   if (showReport) {
     return (
       <View className={styles.container}>
@@ -166,9 +222,14 @@ const HandoverPage: React.FC = () => {
             <Text className={styles.reportSemester}>{report.semester}</Text>
             <Text className={styles.reportDate}>生成日期：{report.generatedAt}</Text>
           </View>
-          <Button className={styles.closeReportBtn} onClick={() => setShowReport(false)}>
-            返回列表
-          </Button>
+          <View className={styles.reportBtnGroup}>
+            <Button className={styles.exportBtn} onClick={handleExportText}>
+              导出文本
+            </Button>
+            <Button className={styles.closeReportBtn} onClick={() => setShowReport(false)}>
+              返回列表
+            </Button>
+          </View>
         </View>
 
         <ScrollView className={styles.reportContent} scrollY>

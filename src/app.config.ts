@@ -4,6 +4,7 @@ export default defineAppConfig({
     'pages/members/index',
     'pages/alerts/index',
     'pages/handover/index',
+    'pages/audit-log/index',
     'pages/folder-detail/index',
     'pages/member-detail/index'
   ],

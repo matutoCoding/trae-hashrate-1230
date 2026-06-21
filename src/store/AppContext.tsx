@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import Taro from '@tarojs/taro';
-import type { Member, Folder, Alert, HandoverItem, Statistics, SensitiveConfirmation } from '@/types';
+import type { Member, Folder, Alert, HandoverItem, Statistics, SensitiveConfirmation, AuditLog, AuditLogType } from '@/types';
 import { members as initialMembers } from '@/data/members';
 import { folders as initialFolders } from '@/data/folders';
 import { alerts as initialAlerts } from '@/data/alerts';
@@ -11,7 +11,27 @@ const STORAGE_KEYS = {
   MEMBERS: 'permission_audit_members',
   FOLDERS: 'permission_audit_folders',
   ALERTS: 'permission_audit_alerts',
-  HANDOVER: 'permission_audit_handover'
+  HANDOVER: 'permission_audit_handover',
+  AUDIT_LOGS: 'permission_audit_logs'
+};
+
+const getStatusText = (status: Member['status']): string => {
+  const map: Record<Member['status'], string> = {
+    studying: '在读',
+    graduated: '已毕业',
+    collaboration_ended: '合作结束',
+    external: '外校合作者'
+  };
+  return map[status] || status;
+};
+
+const getHandoverStatusText = (status: HandoverItem['status']): string => {
+  const map: Record<HandoverItem['status'], string> = {
+    pending: '待处理',
+    confirmed: '进行中',
+    completed: '已完成'
+  };
+  return map[status] || status;
 };
 
 interface AppContextType {
@@ -20,6 +40,7 @@ interface AppContextType {
   folders: Folder[];
   alerts: Alert[];
   handoverItems: HandoverItem[];
+  auditLogs: AuditLog[];
   statistics: Statistics;
   updateMemberStatus: (memberId: string, status: Member['status']) => void;
   resolveAlert: (alertId: string) => void;
@@ -77,6 +98,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [handoverList, setHandoverList] = useState<HandoverItem[]>(() =>
     loadFromStorage(STORAGE_KEYS.HANDOVER, initialHandoverItems)
   );
+  const [auditLogsList, setAuditLogsList] = useState<AuditLog[]>(() =>
+    loadFromStorage(STORAGE_KEYS.AUDIT_LOGS, [])
+  );
   const [statistics, setStatistics] = useState<Statistics>({
     totalFolders: 0,
     totalMembers: 0,
@@ -87,6 +111,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const currentUser = membersList.find(m => m.role === 'supervisor') || membersList[0];
+
+  const addAuditLog = useCallback((log: Omit<AuditLog, 'id' | 'createdAt' | 'operatorId' | 'operatorName'>) => {
+    const newLog: AuditLog = {
+      ...log,
+      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString().split('T')[0],
+      operatorId: currentUser.id,
+      operatorName: currentUser.name
+    };
+    setAuditLogsList(prev => [newLog, ...prev]);
+    saveToStorage(STORAGE_KEYS.AUDIT_LOGS, [newLog, ...auditLogsList]);
+  }, [currentUser, auditLogsList]);
 
   const syncFolderPermissionsWithMembers = useCallback((folders: Folder[], members: Member[]): Folder[] => {
     return folders.map(folder => ({
@@ -111,11 +147,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let alertIdCounter = existingAlerts.length + 1;
 
     folders.forEach(folder => {
-      const riskCheck = checkPermissionRisk(folder.permissions);
+      folder.permissions.forEach(perm => {
+        const isRisk =
+          (perm.memberStatus === 'graduated' && perm.permission === 'edit') ||
+          (perm.memberStatus === 'collaboration_ended' && perm.permission !== 'read');
 
-      riskCheck.details.forEach((detail, idx) => {
-        const perm = folder.permissions[idx];
-        if (perm) {
+        if (isRisk) {
+          const statusText = perm.memberStatus === 'graduated' ? '已毕业' : '合作结束';
+          const permText = perm.permission === 'edit' ? '编辑' : perm.permission === 'admin' ? '管理' : '读取';
+          const detail = `${perm.memberName}（${statusText}）仍拥有${permText}权限`;
+
           const existingAlert = existingAlerts.find(
             a => a.folderId === folder.id &&
               a.memberId === perm.memberId &&
@@ -128,7 +169,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: `alert_${Date.now()}_${alertIdCounter++}`,
               type: 'graduated_edit',
               title: `${perm.memberName}仍拥有编辑权限`,
-              description: detail,
+              description: `${perm.memberName}（${statusText}）仍对"${folder.name}"拥有${permText}权限，请及时处理`,
               folderId: folder.id,
               folderName: folder.name,
               memberId: perm.memberId,
@@ -260,6 +301,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateMemberStatus = useCallback((memberId: string, status: Member['status']) => {
     console.log('[AppContext] Updating member status', { memberId, status });
+    const oldMember = membersList.find(m => m.id === memberId);
 
     const updatedMembers = membersList.map(m =>
       m.id === memberId ? { ...m, status, endDate: status !== 'studying' ? new Date().toISOString().split('T')[0] : undefined } : m
@@ -274,36 +316,83 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAlertsList(updatedAlerts);
     saveToStorage(STORAGE_KEYS.ALERTS, updatedAlerts);
 
+    if (oldMember && oldMember.status !== status) {
+      addAuditLog({
+        type: 'member_status_change',
+        title: `成员状态变更：${oldMember.name}`,
+        description: `${oldMember.name}的状态从${getStatusText(oldMember.status)}变更为${getStatusText(status)}`,
+        memberId,
+        memberName: oldMember.name,
+        oldValue: getStatusText(oldMember.status),
+        newValue: getStatusText(status)
+      });
+    }
+
     Taro.showToast({
       title: '状态已更新',
       icon: 'success'
     });
 
     setTimeout(() => calculateStatistics(), 100);
-  }, [membersList, foldersList, alertsList, syncFolderPermissionsWithMembers, generateAlertsFromFolders, calculateStatistics]);
+  }, [membersList, foldersList, alertsList, syncFolderPermissionsWithMembers, generateAlertsFromFolders, calculateStatistics, addAuditLog]);
 
   const resolveAlert = useCallback((alertId: string) => {
     console.log('[AppContext] Resolving alert', { alertId });
+    const oldAlert = alertsList.find(a => a.id === alertId);
     const updatedAlerts = alertsList.map(a =>
       a.id === alertId ? { ...a, isResolved: true } : a
     );
     setAlertsList(updatedAlerts);
     saveToStorage(STORAGE_KEYS.ALERTS, updatedAlerts);
+
+    if (oldAlert && !oldAlert.isResolved) {
+      addAuditLog({
+        type: 'alert_resolved',
+        title: `风险已处理：${oldAlert.title}`,
+        description: `风险预警「${oldAlert.title}」已标记为已处理`,
+        alertId,
+        folderId: oldAlert.folderId,
+        folderName: oldAlert.folderName,
+        memberId: oldAlert.memberId,
+        memberName: oldAlert.memberName,
+        oldValue: '待处理',
+        newValue: '已处理'
+      });
+    }
+
     calculateStatistics();
-  }, [alertsList, calculateStatistics]);
+  }, [alertsList, calculateStatistics, addAuditLog]);
 
   const updateHandoverStatus = useCallback((itemId: string, status: HandoverItem['status']) => {
     console.log('[AppContext] Updating handover status', { itemId, status });
+    const oldItem = handoverList.find(h => h.id === itemId);
     const updatedHandover = handoverList.map(h =>
       h.id === itemId ? { ...h, status, updatedAt: new Date().toISOString().split('T')[0] } : h
     );
     setHandoverList(updatedHandover);
     saveToStorage(STORAGE_KEYS.HANDOVER, updatedHandover);
+
+    if (oldItem && oldItem.status !== status) {
+      addAuditLog({
+        type: 'handover_completed',
+        title: `交接项状态变更：${oldItem.title}`,
+        description: `交接项「${oldItem.title}」从${getHandoverStatusText(oldItem.status)}变更为${getHandoverStatusText(status)}`,
+        handoverId: itemId,
+        folderId: oldItem.folderId,
+        folderName: oldItem.folderName,
+        memberId: oldItem.memberId,
+        memberName: oldItem.memberName,
+        oldValue: getHandoverStatusText(oldItem.status),
+        newValue: getHandoverStatusText(status)
+      });
+    }
+
     calculateStatistics();
-  }, [handoverList, calculateStatistics]);
+  }, [handoverList, calculateStatistics, addAuditLog]);
 
   const confirmSensitiveFolder = useCallback((folderId: string, confirmation: SensitiveConfirmation) => {
     console.log('[AppContext] Confirming sensitive folder', { folderId, confirmation });
+    const oldFolder = foldersList.find(f => f.id === folderId);
     const updatedFolders = foldersList.map(f =>
       f.id === folderId ? { ...f, sensitiveConfirmed: confirmation } : f
     );
@@ -318,13 +407,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAlertsList(updatedAlerts);
     saveToStorage(STORAGE_KEYS.ALERTS, updatedAlerts);
 
+    if (oldFolder) {
+      addAuditLog({
+        type: 'sensitive_confirmed',
+        title: `敏感目录已确认：${oldFolder.name}`,
+        description: `敏感目录「${oldFolder.name}」共享范围已确认，共${confirmation.sharedMembers.length}人可访问`,
+        folderId,
+        folderName: oldFolder.name,
+        oldValue: '未确认',
+        newValue: '已确认'
+      });
+    }
+
     Taro.showToast({
       title: '确认已记录',
       icon: 'success'
     });
 
     calculateStatistics();
-  }, [foldersList, alertsList, calculateStatistics]);
+  }, [foldersList, alertsList, calculateStatistics, addAuditLog]);
 
   const getFolderById = useCallback((id: string) => {
     return foldersList.find(f => f.id === id);
@@ -344,10 +445,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     Taro.removeStorageSync(STORAGE_KEYS.FOLDERS);
     Taro.removeStorageSync(STORAGE_KEYS.ALERTS);
     Taro.removeStorageSync(STORAGE_KEYS.HANDOVER);
+    Taro.removeStorageSync(STORAGE_KEYS.AUDIT_LOGS);
     setMembersList(initialMembers);
     setFoldersList(initialFolders);
     setAlertsList(initialAlerts);
     setHandoverList(initialHandoverItems);
+    setAuditLogsList([]);
     Taro.showToast({
       title: '数据已重置',
       icon: 'success'
@@ -362,6 +465,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         folders: foldersList,
         alerts: alertsList,
         handoverItems: handoverList,
+        auditLogs: auditLogsList,
         statistics,
         updateMemberStatus,
         resolveAlert,

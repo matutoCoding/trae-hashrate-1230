@@ -194,6 +194,60 @@
   }
 }
 
+.quickActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.quickAction {
+  display: flex;
+  align-items: center;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.quickIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, rgba(30, 94, 190, 0.1) 0%, rgba(46, 125, 216, 0.1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: $spacing-md;
+}
+
+.quickText {
+  flex: 1;
+}
+
+.quickTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.quickDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.quickArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+}
+
 .sectionTitle {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;

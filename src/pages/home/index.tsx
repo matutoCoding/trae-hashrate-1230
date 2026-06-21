@@ -48,6 +48,13 @@ const HomePage: React.FC = () => {
     console.log('[HomePage] Navigate to alerts page');
   };
 
+  const handleGoToAuditLog = () => {
+    Taro.navigateTo({
+      url: '/pages/audit-log/index'
+    });
+    console.log('[HomePage] Navigate to audit log page');
+  };
+
   const handleCategoryChange = (category: FolderCategory) => {
     setActiveCategory(category);
     console.log('[HomePage] Category changed', { category });
@@ -106,6 +113,17 @@ const HomePage: React.FC = () => {
             <Button className={styles.alertBtn}>立即处理</Button>
           </View>
         )}
+
+        <View className={styles.quickActions}>
+          <View className={styles.quickAction} onClick={handleGoToAuditLog}>
+            <View className={styles.quickIcon}>📑</View>
+            <View className={styles.quickText}>
+              <Text className={styles.quickTitle}>处理台账</Text>
+              <Text className={styles.quickDesc}>查看操作记录</Text>
+            </View>
+            <Text className={styles.quickArrow}>›</Text>
+          </View>
+        </View>
 
         <View className={styles.categoryTabs}>
           {categories.map(cat => (

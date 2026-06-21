@@ -40,21 +40,22 @@ const AlertsPage: React.FC = () => {
       list = list.filter(a => a.severity === activeFilter);
     }
     if (confirmedFilter === 'confirmed') {
-      list = list.filter(a => a.isSensitiveConfirmed === true);
+      list = list.filter(a => a.type === 'sensitive_folder' && a.isSensitiveConfirmed === true);
     } else if (confirmedFilter === 'unconfirmed') {
-      list = list.filter(a => a.isSensitiveConfirmed === false);
+      list = list.filter(a => a.type === 'sensitive_folder' && a.isSensitiveConfirmed === false);
     }
     return list;
   }, [activeAlerts, resolvedAlerts, activeFilter, showResolved, confirmedFilter]);
 
   const stats = useMemo(() => {
+    const sensitiveAlerts = activeAlerts.filter(a => a.type === 'sensitive_folder');
     return {
       total: activeAlerts.length,
       high: activeAlerts.filter(a => a.severity === 'high').length,
       medium: activeAlerts.filter(a => a.severity === 'medium').length,
       low: activeAlerts.filter(a => a.severity === 'low').length,
-      unconfirmedSensitive: activeAlerts.filter(a => a.type === 'sensitive' && a.isSensitiveConfirmed === false).length,
-      confirmedSensitive: activeAlerts.filter(a => a.type === 'sensitive' && a.isSensitiveConfirmed === true).length
+      unconfirmedSensitive: sensitiveAlerts.filter(a => a.isSensitiveConfirmed === false).length,
+      confirmedSensitive: sensitiveAlerts.filter(a => a.isSensitiveConfirmed === true).length
     };
   }, [activeAlerts]);
 

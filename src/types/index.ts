@@ -107,6 +107,30 @@ export interface HandoverReport {
   };
 }
 
+export type AuditLogType =
+  | 'member_status_change'
+  | 'alert_resolved'
+  | 'sensitive_confirmed'
+  | 'handover_completed';
+
+export interface AuditLog {
+  id: string;
+  type: AuditLogType;
+  title: string;
+  description: string;
+  operatorId: string;
+  operatorName: string;
+  memberId?: string;
+  memberName?: string;
+  folderId?: string;
+  folderName?: string;
+  handoverId?: string;
+  alertId?: string;
+  oldValue?: string;
+  newValue?: string;
+  createdAt: string;
+}
+
 export interface Statistics {
   totalFolders: number;
   totalMembers: number;
